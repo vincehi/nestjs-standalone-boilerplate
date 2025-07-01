@@ -20,9 +20,11 @@ export interface ProductListResult {
 	};
 }
 
-export interface IProductService {
-	getProductList(params: ProductListParams): Promise<ProductListResult>;
-	getTotalItems(): Promise<{ total: number }>;
-	getProductById(id: number): Promise<Product | null>;
-	getProductByIds(ids: number[]): Promise<Product[]>;
+export abstract class IProductService {
+	abstract getProductList(
+		params: ProductListParams
+	): Promise<ProductListResult>;
+	abstract getTotalItems(): Promise<{ total: number }>;
+	abstract getProductById(id: number): Promise<Product | null>;
+	abstract getProductByIds(ids: number[]): Promise<Product[]>;
 }

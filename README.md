@@ -14,7 +14,7 @@ npm run ex
 ## 🏗️ Key Features
 
 - **Standalone DI Container**: No HTTP server overhead
-- **Interface-Based Injection**: Use `src/types.ts` to inject interfaces instead of concrete classes
+- **Abstract Class-Based Injection**: Use abstract classes as injection tokens for type-safe DI
 - **Mock/Real Switching**: Easy toggle between mock and real implementations
 - **Type-Safe**: Full TypeScript support with autocomplete
 
@@ -23,18 +23,22 @@ npm run ex
 ```
 src/
 ├── container.ts              # Standalone DI container
-├── types.ts                  # DI symbols and return types
 ├── app.module.ts            # Root module
 └── product/                 # Example service module
+    └── services/
+        ├── product-service.interface.ts  # Abstract class as interface
+        ├── product.service.ts            # Real implementation
+        └── product-mock.service.ts       # Mock implementation
 ```
 
 ## 🔧 Usage
 
 ```typescript
 import { getInjection } from "./src/container";
+import { IProductService } from "./src/product/services/product-service.interface";
 
-// Get service by interface
-const productService = await getInjection("IProductService");
+// Get service by abstract class (acts as interface)
+const productService = await getInjection(IProductService);
 const result = await productService.getTotalItems();
 ```
 
@@ -43,10 +47,11 @@ const result = await productService.getTotalItems();
 ```typescript
 // In a query/controller
 import { query } from "@solidjs/router";
+import { IProductService } from "./src/product/services/product-service.interface";
 
 export const getProductListQuery = query(async () => {
 	"use server";
-  const productService = await getInjection("IProductService");
+  const productService = await getInjection(IProductService);
   return await productService.getProductList({ skip: 0, take: 10 });
 }, "get-product-list");
 ```
@@ -57,15 +62,16 @@ Update `app.module.ts` providers:
 
 ```typescript
 // Real implementation
-{ provide: DI_SYMBOLS.IProductService, useClass: ProductService }
+{ provide: IProductService, useClass: ProductService }
 
 // Mock implementation  
-{ provide: DI_SYMBOLS.IProductService, useClass: ProductMockService }
+{ provide: IProductService, useClass: ProductMockService }
 ```
 
 ## 🎉 Benefits
 
 - Lightweight integration
-- Type-safe dependency injection
+- Type-safe dependency injection using abstract classes
 - Easy mock/real switching
 - Framework-agnostic
+- No need for separate DI symbols

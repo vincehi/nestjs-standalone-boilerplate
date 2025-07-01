@@ -1,29 +1,19 @@
 import { getInjection } from "./src/container";
+import { IProductService } from "./src/product/services/product-service.interface";
 
-async function main() {
-	try {
-		console.log("🚀 Démarrage de l'exemple d'injection de dépendance...");
+async function example() {
+	// Récupération du service avec typage automatique
+	const productService = await getInjection(IProductService);
 
-		const productService = await getInjection("IProductService");
+	// Utilisation du service
+	const products = await productService.getProductList({ skip: 0, take: 10 });
+	console.log("Produits récupérés:", products.data.length);
 
-		console.log("✅ Service IProductService récupéré avec succès");
+	const total = await productService.getTotalItems();
+	console.log("Total des produits:", total.total);
 
-		const result = await productService.getTotalItems();
-
-		console.log("📊 Résultat de getTotalItems:", result);
-		console.log(`📈 Nombre total d'articles: ${result.total}`);
-	} catch (error) {
-		console.error("❌ Erreur lors de l'exécution:", error);
-		process.exit(1);
-	}
+	const product = await productService.getProductById(1);
+	console.log("Produit avec ID 1:", product);
 }
 
-main()
-	.then(() => {
-		console.log("✅ Exemple terminé avec succès");
-		process.exit(0);
-	})
-	.catch((error) => {
-		console.error("❌ Erreur fatale:", error);
-		process.exit(1);
-	});
+example().catch(console.error);

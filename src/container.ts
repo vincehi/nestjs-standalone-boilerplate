@@ -1,7 +1,6 @@
-import { INestApplicationContext } from "@nestjs/common";
+import { INestApplicationContext, InjectionToken, Type } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { DI_RETURN_TYPES, DI_SYMBOLS } from "./types";
 
 let appInstance: INestApplicationContext;
 
@@ -12,9 +11,7 @@ export async function createStandaloneApp(): Promise<INestApplicationContext> {
 	return appInstance;
 }
 
-export async function getInjection<K extends keyof typeof DI_SYMBOLS>(
-	symbol: K
-) {
+export async function getInjection<T>(token: InjectionToken<T>) {
 	const app = await createStandaloneApp();
-	return app.get<DI_RETURN_TYPES[K]>(DI_SYMBOLS[symbol]);
+	return app.get(token);
 }
